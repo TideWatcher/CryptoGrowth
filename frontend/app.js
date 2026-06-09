@@ -55,6 +55,18 @@ function setPlaceholder(cardId, msg) {
   if (actions) actions.style.display = "none";
 }
 
+function isSeparator(line) {
+  return /^[-*_]{3,}$/.test(line.trim());
+}
+
+function stripSeparators(text) {
+  return text
+    .split("\n")
+    .filter(line => !isSeparator(line))
+    .join("\n")
+    .trim();
+}
+
 function splitContent(raw) {
   const wechatMarkers = ["【公众号长文】", "【WeChat Article】", "公众号长文", "WeChat"];
   const twitterMarkers = ["【X Thread】", "X Thread", "Twitter Thread"];
@@ -69,20 +81,20 @@ function splitContent(raw) {
     if (currentSection) sections[currentSection].push(line);
   }
 
-  let wechat = sections.wechat.join("\n").trim();
-  let twitter = sections.twitter.join("\n").trim();
+  let wechat = stripSeparators(sections.wechat.join("\n").trim());
+  let twitter = stripSeparators(sections.twitter.join("\n").trim());
 
   if (!wechat && !twitter) {
     const mid = raw.indexOf("\n\n1/");
     if (mid > 0) {
-      wechat = raw.slice(0, mid).trim();
-      twitter = raw.slice(mid).trim();
+      wechat = stripSeparators(raw.slice(0, mid).trim());
+      twitter = stripSeparators(raw.slice(mid).trim());
     } else {
-      wechat = raw;
+      wechat = stripSeparators(raw);
     }
   }
 
-  return { wechat: wechat || raw, twitter };
+  return { wechat: wechat || stripSeparators(raw), twitter };
 }
 
 async function generate() {
@@ -192,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const el = document.getElementById("twitter-content");
     const text = el.textContent;
     if (!text || el.querySelector(".placeholder-text")) return;
-    const first = text.split(/\n\n+/).find(t => t.trim()) || text;
+    const first = text.split(/\n\n+/).find(t => t.trim() && !isSeparator(t)) || text;
     navigator.clipboard.writeText(first.trim()).then(() => {
       const btn = document.getElementById("copy-twitter-first");
       btn.textContent = "已复制";
