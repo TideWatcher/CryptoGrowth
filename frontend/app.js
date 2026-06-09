@@ -204,7 +204,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const el = document.getElementById("twitter-content");
     const text = el.textContent;
     if (!text || el.querySelector(".placeholder-text")) return;
-    const first = text.split(/\n\n+/).find(t => t.trim() && !isSeparator(t)) || text;
+    const paragraphs = text.split(/\n\n+/).filter(t => t.trim() && !isSeparator(t));
+    const startIdx = paragraphs.findIndex(p => /^\d+\//.test(p.trim()));
+    let first;
+    if (startIdx === -1) {
+      first = paragraphs[0] || text;
+    } else {
+      let endIdx = paragraphs.findIndex((p, i) => i > startIdx && /^\d+\//.test(p.trim()));
+      if (endIdx === -1) endIdx = paragraphs.length;
+      first = paragraphs.slice(startIdx, endIdx).join("\n\n");
+    }
     navigator.clipboard.writeText(first.trim()).then(() => {
       const btn = document.getElementById("copy-twitter-first");
       btn.textContent = "已复制";
