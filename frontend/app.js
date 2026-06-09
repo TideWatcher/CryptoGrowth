@@ -1,15 +1,24 @@
 const API_BASE = "";
 
+const MAX_STYLES = 3;
+
 const state = {
-  style: "kol",
+  styles: ["kol"],
   language: "zh",
+  wechatLength: "1000-1500",
+  twitterLength: "5",
 };
 
 function $(id) { return document.getElementById(id); }
 
-function setStyle(s) {
-  state.style = s;
-  document.querySelectorAll(".btn-style").forEach(b => b.classList.toggle("active", b.dataset.style === s));
+function toggleStyle(s) {
+  const idx = state.styles.indexOf(s);
+  if (idx !== -1) {
+    if (state.styles.length > 1) state.styles.splice(idx, 1);
+  } else if (state.styles.length < MAX_STYLES) {
+    state.styles.push(s);
+  }
+  document.querySelectorAll(".btn-style").forEach(b => b.classList.toggle("active", state.styles.includes(b.dataset.style)));
 }
 
 function setLanguage(l) {
@@ -19,6 +28,11 @@ function setLanguage(l) {
 
 function getCheckedTypes() {
   return ["wechat", "twitter"].filter(t => document.getElementById(`type-${t}`).checked);
+}
+
+function updateSubOptions() {
+  $("wechat-length-options").classList.toggle("disabled", !$("type-wechat").checked);
+  $("twitter-length-options").classList.toggle("disabled", !$("type-twitter").checked);
 }
 
 function showSkeleton(cardId) {
@@ -131,8 +145,10 @@ async function generate() {
       body: JSON.stringify({
         raw_material: rawMaterial,
         content_types: contentTypes,
-        style: state.style,
+        styles: state.styles,
         language: state.language,
+        wechat_length: state.wechatLength,
+        twitter_length: state.twitterLength,
       }),
     });
 
@@ -165,7 +181,14 @@ async function generate() {
     const { wechat, twitter } = splitContent(data.content);
 
     if (contentTypes.includes("wechat")) setCardContent("wechat", wechat);
-    if (contentTypes.includes("twitter")) setCardContent("twitter", twitter || data.content);
+    if (contentTypes.includes("twitter")) {
+      setCardContent("twitter", twitter || data.content);
+      const copyFirstBtn = $("copy-twitter-first");
+      const hint = document.querySelector("#twitter-actions .action-hint");
+      const isSingle = state.twitterLength === "single";
+      copyFirstBtn.style.display = isSingle ? "none" : "";
+      hint.textContent = isSingle ? "复制全文后前往 X 发布" : "复制第 1 条后前往 X 发布 Thread";
+    }
 
   } catch (e) {
     $("error-msg").textContent = `生成失败：${e.message}`;
@@ -192,10 +215,19 @@ function copyCard(cardId) {
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".btn-style").forEach(b => {
-    b.addEventListener("click", () => setStyle(b.dataset.style));
+    b.addEventListener("click", () => toggleStyle(b.dataset.style));
   });
   document.querySelectorAll(".btn-lang").forEach(b => {
     b.addEventListener("click", () => setLanguage(b.dataset.lang));
+  });
+  document.getElementById("type-wechat").addEventListener("change", updateSubOptions);
+  document.getElementById("type-twitter").addEventListener("change", updateSubOptions);
+  updateSubOptions();
+  document.querySelectorAll('input[name="wechat-length"]').forEach(r => {
+    r.addEventListener("change", () => { if (r.checked) state.wechatLength = r.value; });
+  });
+  document.querySelectorAll('input[name="twitter-length"]').forEach(r => {
+    r.addEventListener("change", () => { if (r.checked) state.twitterLength = r.value; });
   });
   document.getElementById("copy-wechat").addEventListener("click", () => copyCard("wechat"));
   document.getElementById("copy-twitter").addEventListener("click", () => copyCard("twitter"));

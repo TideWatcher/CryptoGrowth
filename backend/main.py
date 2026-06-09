@@ -207,8 +207,10 @@ async def google_callback(code: str, db: Session = Depends(get_db)):
 class GenerateRequest(BaseModel):
     raw_material: str
     content_types: list[str] = ["wechat", "twitter"]
-    style: str = "kol"
+    styles: list[str] = ["kol"]
     language: str = "zh"
+    wechat_length: str = "1000-1500"
+    twitter_length: str = "5"
 
 
 @app.post("/api/generate")
@@ -233,8 +235,10 @@ async def generate(req: GenerateRequest, user: User = Depends(require_user), db:
     system_prompt, user_prompt = build_prompt(
         raw_material=req.raw_material,
         content_types=req.content_types,
-        style=req.style,
+        styles=req.styles,
         language=req.language,
+        wechat_length=req.wechat_length,
+        twitter_length=req.twitter_length,
     )
 
     client = anthropic.Anthropic(api_key=api_key)

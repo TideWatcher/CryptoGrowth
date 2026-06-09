@@ -143,27 +143,48 @@
 支持中英文，Ctrl+Enter 快速生成"
     ></textarea>
 
-    <div class="field-label">写作风格</div>
+    <div class="field-label">写作风格 <span class="field-hint">（最多选 3 个）</span></div>
     <div class="btn-group">
       <button class="btn-toggle btn-style active" data-style="kol">KOL 叙事</button>
       <button class="btn-toggle btn-style" data-style="analyst">分析师</button>
       <button class="btn-toggle btn-style" data-style="official">项目方官方</button>
+      <button class="btn-toggle btn-style" data-style="humorous">幽默风趣</button>
+      <button class="btn-toggle btn-style" data-style="rigorous">科学严谨</button>
+      <button class="btn-toggle btn-style" data-style="storytelling">故事化叙事</button>
     </div>
 
     <div class="field-label">输出格式</div>
-    <div class="checkboxes">
+    <div class="format-group">
       <label class="checkbox-label">
         <input type="checkbox" id="type-wechat" checked /> 公众号长文
       </label>
+      <div class="sub-options" id="wechat-length-options">
+        <label class="radio-label"><input type="radio" name="wechat-length" value="600-1000" /> 600-1000 字</label>
+        <label class="radio-label"><input type="radio" name="wechat-length" value="1000-1500" checked /> 1000-1500 字</label>
+        <label class="radio-label"><input type="radio" name="wechat-length" value="1500+" /> 1500 字以上</label>
+      </div>
+
       <label class="checkbox-label">
         <input type="checkbox" id="type-twitter" checked /> X Thread
       </label>
+      <div class="sub-options" id="twitter-length-options">
+        <label class="radio-label"><input type="radio" name="twitter-length" value="single" /> 整段</label>
+        <label class="radio-label"><input type="radio" name="twitter-length" value="3" /> 3 条</label>
+        <label class="radio-label"><input type="radio" name="twitter-length" value="4" /> 4 条</label>
+        <label class="radio-label"><input type="radio" name="twitter-length" value="5" checked /> 5 条</label>
+        <label class="radio-label"><input type="radio" name="twitter-length" value="6" /> 6 条</label>
+        <label class="radio-label"><input type="radio" name="twitter-length" value="7" /> 7 条</label>
+      </div>
     </div>
 
     <div class="field-label">语言</div>
     <div class="btn-group">
       <button class="btn-toggle btn-lang active" data-lang="zh">中文</button>
       <button class="btn-toggle btn-lang" data-lang="en">English</button>
+      <button class="btn-toggle btn-lang" data-lang="ja">日本語</button>
+      <button class="btn-toggle btn-lang" data-lang="ko">한국어</button>
+      <button class="btn-toggle btn-lang" data-lang="ru">Русский</button>
+      <button class="btn-toggle btn-lang" data-lang="pt">Português</button>
     </div>
 
     <button id="generate-btn" class="btn-generate">生成内容</button>
