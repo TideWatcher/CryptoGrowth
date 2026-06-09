@@ -3,7 +3,6 @@ const API_BASE = "";
 const state = {
   style: "kol",
   language: "zh",
-  loading: false,
 };
 
 function $(id) { return document.getElementById(id); }
@@ -33,6 +32,8 @@ function showSkeleton(cardId) {
     <div class="skeleton medium"></div>
   `;
   document.getElementById(`${cardId}-count`).textContent = "";
+  const actions = document.getElementById(`${cardId}-actions`);
+  if (actions) actions.style.display = "none";
 }
 
 function setCardContent(cardId, text) {
@@ -55,30 +56,22 @@ function setPlaceholder(cardId, msg) {
 }
 
 function splitContent(raw) {
-  const wechatMarkers = ["【公众号长文】", "【WeChat Article】", "# 公众号", "公众号长文", "WeChat"];
-  const twitterMarkers = ["【X Thread】", "# X Thread", "X Thread", "Twitter Thread", "Thread"];
+  const wechatMarkers = ["【公众号长文】", "【WeChat Article】", "公众号长文", "WeChat"];
+  const twitterMarkers = ["【X Thread】", "X Thread", "Twitter Thread"];
 
-  let wechat = "", twitter = "";
-
-  // Try to find clear markers
   const lines = raw.split("\n");
   let currentSection = null;
   const sections = { wechat: [], twitter: [] };
 
   for (const line of lines) {
-    const isWechat = wechatMarkers.some(m => line.includes(m));
-    const isTwitter = twitterMarkers.some(m => line.includes(m));
-
-    if (isWechat) { currentSection = "wechat"; continue; }
-    if (isTwitter) { currentSection = "twitter"; continue; }
-
+    if (wechatMarkers.some(m => line.includes(m))) { currentSection = "wechat"; continue; }
+    if (twitterMarkers.some(m => line.includes(m))) { currentSection = "twitter"; continue; }
     if (currentSection) sections[currentSection].push(line);
   }
 
-  wechat = sections.wechat.join("\n").trim();
-  twitter = sections.twitter.join("\n").trim();
+  let wechat = sections.wechat.join("\n").trim();
+  let twitter = sections.twitter.join("\n").trim();
 
-  // Fallback: if no markers found but both requested, split at midpoint
   if (!wechat && !twitter) {
     const mid = raw.indexOf("\n\n1/");
     if (mid > 0) {
@@ -122,6 +115,7 @@ async function generate() {
     const res = await fetch(`${API_BASE}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         raw_material: rawMaterial,
         content_types: contentTypes,
@@ -130,20 +124,37 @@ async function generate() {
       }),
     });
 
+    if (res.status === 401) {
+      showAuthModal();
+      setPlaceholder("wechat", "请登录后使用");
+      setPlaceholder("twitter", "请登录后使用");
+      return;
+    }
+
+    if (res.status === 402) {
+      showPaywall();
+      setPlaceholder("wechat", "免费次数已用完，请订阅");
+      setPlaceholder("twitter", "免费次数已用完，请订阅");
+      return;
+    }
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.detail || `HTTP ${res.status}`);
     }
 
     const data = await res.json();
+
+    // Update usage display
+    if (typeof data.free_uses_remaining === "number") {
+      updateUsage(data.free_uses_remaining, data.is_subscribed);
+    }
+
     const { wechat, twitter } = splitContent(data.content);
 
-    if (contentTypes.includes("wechat")) {
-      setCardContent("wechat", wechat);
-    }
-    if (contentTypes.includes("twitter")) {
-      setCardContent("twitter", twitter || data.content);
-    }
+    if (contentTypes.includes("wechat")) setCardContent("wechat", wechat);
+    if (contentTypes.includes("twitter")) setCardContent("twitter", twitter || data.content);
+
   } catch (e) {
     $("error-msg").textContent = `生成失败：${e.message}`;
     $("error-msg").style.display = "block";
@@ -159,31 +170,24 @@ function copyCard(cardId) {
   const el = document.getElementById(`${cardId}-content`);
   const text = el.textContent;
   if (!text || el.querySelector(".placeholder-text")) return;
-
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById(`copy-${cardId}`);
     btn.textContent = "已复制";
     btn.classList.add("copied");
-    setTimeout(() => { btn.textContent = "复制"; btn.classList.remove("copied"); }, 1500);
+    setTimeout(() => { btn.textContent = "复制全文"; btn.classList.remove("copied"); }, 1500);
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Wire style buttons
   document.querySelectorAll(".btn-style").forEach(b => {
     b.addEventListener("click", () => setStyle(b.dataset.style));
   });
-
-  // Wire language buttons
   document.querySelectorAll(".btn-lang").forEach(b => {
     b.addEventListener("click", () => setLanguage(b.dataset.lang));
   });
-
-  // Wire copy buttons
   document.getElementById("copy-wechat").addEventListener("click", () => copyCard("wechat"));
   document.getElementById("copy-twitter").addEventListener("click", () => copyCard("twitter"));
 
-  // Copy first tweet only
   document.getElementById("copy-twitter-first").addEventListener("click", () => {
     const el = document.getElementById("twitter-content");
     const text = el.textContent;
@@ -197,10 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Wire generate
   $("generate-btn").addEventListener("click", generate);
-
-  // Ctrl/Cmd+Enter to generate
   $("raw-material").addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") generate();
   });
