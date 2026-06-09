@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoWrite — AI 驱动的加密内容工厂</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<header>
+  <span class="logo">₿ CryptoWrite</span>
+  <span class="tagline">AI 驱动的加密内容工厂</span>
+</header>
+
+<div class="layout">
+
+  <!-- Left: Input -->
+  <div class="panel">
+    <div class="panel-title">原始素材</div>
+
+    <textarea
+      id="raw-material"
+      placeholder="粘贴原始素材...
+
+例如：
+• 链上数据（TVL 变化、鲸鱼转账、DEX 交易量）
+• 项目公告（融资、上线、合作）
+• 市场行情分析
+• 新闻摘要
+
+支持中英文，Ctrl+Enter 快速生成"
+    ></textarea>
+
+    <div class="field-label">写作风格</div>
+    <div class="btn-group">
+      <button class="btn-toggle btn-style active" data-style="kol">KOL 叙事</button>
+      <button class="btn-toggle btn-style" data-style="analyst">分析师</button>
+      <button class="btn-toggle btn-style" data-style="official">项目方官方</button>
+    </div>
+
+    <div class="field-label">输出格式</div>
+    <div class="checkboxes">
+      <label class="checkbox-label">
+        <input type="checkbox" id="type-wechat" checked /> 公众号长文
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="type-twitter" checked /> X Thread
+      </label>
+    </div>
+
+    <div class="field-label">语言</div>
+    <div class="btn-group">
+      <button class="btn-toggle btn-lang active" data-lang="zh">中文</button>
+      <button class="btn-toggle btn-lang" data-lang="en">English</button>
+    </div>
+
+    <button id="generate-btn" class="btn-generate">生成内容</button>
+
+    <div id="error-msg" class="error-msg" style="display:none;"></div>
+  </div>
+
+  <!-- Right: Output -->
+  <div class="panel">
+    <div class="panel-title">生成结果</div>
+
+    <div class="output-cards">
+
+      <!-- WeChat card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">公众号长文</span>
+          <div class="card-meta">
+            <span class="char-count" id="wechat-count"></span>
+            <button class="btn-copy" id="copy-wechat">复制</button>
+          </div>
+        </div>
+        <div class="card-content" id="wechat-content">
+          <span class="placeholder-text">填写左侧素材，点击「生成内容」</span>
+        </div>
+      </div>
+
+      <!-- Twitter card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">X Thread</span>
+          <div class="card-meta">
+            <span class="char-count" id="twitter-count"></span>
+            <button class="btn-copy" id="copy-twitter">复制</button>
+          </div>
+        </div>
+        <div class="card-content" id="twitter-content">
+          <span class="placeholder-text">填写左侧素材，点击「生成内容」</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
