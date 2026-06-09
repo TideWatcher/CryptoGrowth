@@ -197,6 +197,45 @@ textarea::placeholder { color: var(--text2); }
   100% { background-position: -200% 0; }
 }
 
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--bg3);
+  flex-wrap: wrap;
+}
+
+.action-hint {
+  font-size: 11px;
+  color: var(--text2);
+  flex: 1;
+  min-width: 120px;
+}
+
+.btn-action {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-action:hover { border-color: var(--orange); color: var(--orange); }
+.btn-action.copied { border-color: var(--green); color: var(--green); }
+.btn-action-primary {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #000;
+  font-weight: 600;
+}
+.btn-action-primary:hover { background: var(--orange-hover); border-color: var(--orange-hover); color: #000; }
+
 .error-msg {
   margin-top: 12px;
   padding: 10px 14px;

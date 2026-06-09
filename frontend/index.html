@@ -72,11 +72,15 @@
           <span class="card-title">公众号长文</span>
           <div class="card-meta">
             <span class="char-count" id="wechat-count"></span>
-            <button class="btn-copy" id="copy-wechat">复制</button>
+            <button class="btn-copy" id="copy-wechat">复制全文</button>
           </div>
         </div>
         <div class="card-content" id="wechat-content">
           <span class="placeholder-text">填写左侧素材，点击「生成内容」</span>
+        </div>
+        <div class="card-actions" id="wechat-actions" style="display:none;">
+          <span class="action-hint">复制后前往公众号后台粘贴发布</span>
+          <a class="btn-action" href="https://mp.weixin.qq.com" target="_blank" rel="noopener">✏️ 去公众号后台</a>
         </div>
       </div>
 
@@ -86,11 +90,16 @@
           <span class="card-title">X Thread</span>
           <div class="card-meta">
             <span class="char-count" id="twitter-count"></span>
-            <button class="btn-copy" id="copy-twitter">复制</button>
+            <button class="btn-copy" id="copy-twitter">复制全文</button>
           </div>
         </div>
         <div class="card-content" id="twitter-content">
           <span class="placeholder-text">填写左侧素材，点击「生成内容」</span>
+        </div>
+        <div class="card-actions" id="twitter-actions" style="display:none;">
+          <span class="action-hint">复制第 1 条后前往 X 发布 Thread</span>
+          <button class="btn-action" id="copy-twitter-first">📋 复制第 1 条</button>
+          <a class="btn-action btn-action-primary" href="https://x.com/compose/post" target="_blank" rel="noopener">🐦 去 X 发推</a>
         </div>
       </div>
 

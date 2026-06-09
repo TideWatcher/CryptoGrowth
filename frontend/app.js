@@ -42,12 +42,16 @@ function setCardContent(cardId, text) {
     ? `${text.length} 字`
     : `${text.split(/\n\n+/).filter(t => t.trim()).length} 条`;
   document.getElementById(`${cardId}-count`).textContent = count;
+  const actions = document.getElementById(`${cardId}-actions`);
+  if (actions) actions.style.display = "flex";
 }
 
 function setPlaceholder(cardId, msg) {
   const el = document.getElementById(`${cardId}-content`);
   el.innerHTML = `<span class="placeholder-text">${msg}</span>`;
   document.getElementById(`${cardId}-count`).textContent = "";
+  const actions = document.getElementById(`${cardId}-actions`);
+  if (actions) actions.style.display = "none";
 }
 
 function splitContent(raw) {
@@ -178,6 +182,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // Wire copy buttons
   document.getElementById("copy-wechat").addEventListener("click", () => copyCard("wechat"));
   document.getElementById("copy-twitter").addEventListener("click", () => copyCard("twitter"));
+
+  // Copy first tweet only
+  document.getElementById("copy-twitter-first").addEventListener("click", () => {
+    const el = document.getElementById("twitter-content");
+    const text = el.textContent;
+    if (!text || el.querySelector(".placeholder-text")) return;
+    const first = text.split(/\n\n+/).find(t => t.trim()) || text;
+    navigator.clipboard.writeText(first.trim()).then(() => {
+      const btn = document.getElementById("copy-twitter-first");
+      btn.textContent = "已复制";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "📋 复制第 1 条"; btn.classList.remove("copied"); }, 1500);
+    });
+  });
 
   // Wire generate
   $("generate-btn").addEventListener("click", generate);
