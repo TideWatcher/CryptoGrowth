@@ -372,8 +372,19 @@ textarea::placeholder { color: var(--text2); }
 }
 .payment-tab.active { border-color: var(--orange); color: var(--orange); background: rgba(247,147,26,0.08); }
 
+.tab-badge {
+  display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 999px;
+  background: var(--green); color: #fff; font-size: 10px; font-weight: 700; vertical-align: middle;
+}
+
 .payment-panel { display: none; }
 .payment-panel.active { display: block; }
+
+.usdt-recommend {
+  font-size: 12px; font-weight: 600; color: var(--green);
+  background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3);
+  border-radius: var(--radius); padding: 8px 10px; margin-bottom: 10px;
+}
 
 .usdt-address {
   background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius);

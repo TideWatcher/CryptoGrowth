@@ -84,25 +84,14 @@
     </div>
 
     <div class="payment-tabs">
-      <div class="payment-tab active" data-tab="card">💳 银行卡 / VISA</div>
+      <div class="payment-tab active" data-tab="usdt">₮ USDT <span class="tab-badge">推荐</span></div>
+      <div class="payment-tab" data-tab="card">💳 银行卡 / VISA</div>
       <div class="payment-tab" data-tab="airwallex">🌐 国际卡 / VISA</div>
-      <div class="payment-tab" data-tab="usdt">₮ USDT</div>
-    </div>
-
-    <!-- Card payment -->
-    <div class="payment-panel active" id="panel-card">
-      <button class="btn-primary" id="btn-stripe-pay">前往安全支付页面 →</button>
-      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text2);">由 Stripe 提供支付安全保障 · 支持 VISA / Mastercard</div>
-    </div>
-
-    <!-- Airwallex payment -->
-    <div class="payment-panel" id="panel-airwallex">
-      <button class="btn-primary" id="btn-airwallex-pay">前往安全支付页面 →</button>
-      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text2);">由 Airwallex 提供支付安全保障 · 支持全球 VISA / Mastercard</div>
     </div>
 
     <!-- USDT payment -->
-    <div class="payment-panel" id="panel-usdt">
+    <div class="payment-panel active" id="panel-usdt">
+      <div class="usdt-recommend">✅ 最快、最稳定的支付方式 · 不受银行卡地区限制</div>
       <div class="usdt-note">请向以下地址转入 <strong>$8.88 等值 USDT（TRC20）</strong>，转账后粘贴交易哈希，人工审核通常在 24 小时内完成。</div>
       <div class="usdt-address" id="usdt-address-display">加载中...</div>
       <button class="btn-copy btn-action" id="copy-usdt-addr" style="margin-bottom:12px;">复制地址</button>
@@ -112,6 +101,18 @@
       </div>
       <button class="btn-primary" id="btn-usdt-submit">提交审核</button>
       <div class="form-error" id="usdt-error"></div>
+    </div>
+
+    <!-- Card payment -->
+    <div class="payment-panel" id="panel-card">
+      <button class="btn-primary" id="btn-stripe-pay">前往安全支付页面 →</button>
+      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text2);">由 Stripe 提供支付安全保障 · 支持 VISA / Mastercard</div>
+    </div>
+
+    <!-- Airwallex payment -->
+    <div class="payment-panel" id="panel-airwallex">
+      <button class="btn-primary" id="btn-airwallex-pay">前往安全支付页面 →</button>
+      <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text2);">由 Airwallex 提供支付安全保障 · 支持全球 VISA / Mastercard</div>
     </div>
 
     <div style="text-align:center;margin-top:14px;">
