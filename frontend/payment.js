@@ -3,6 +3,27 @@
 function showPaywall() {
   document.getElementById("paywall-overlay").classList.remove("hidden");
   loadUSDTAddress();
+  loadPaymentsConfig();
+}
+
+async function loadPaymentsConfig() {
+  try {
+    const res = await fetch("/payments/config");
+    const data = await res.json();
+
+    const cardTab = document.querySelector('.payment-tab[data-tab="card"]');
+    const airwallexTab = document.querySelector('.payment-tab[data-tab="airwallex"]');
+
+    if (!data.stripe_enabled) cardTab.style.display = "none";
+    if (!data.airwallex_enabled) airwallexTab.style.display = "none";
+
+    // if the active tab is now hidden, switch to the first visible tab
+    const activeTab = document.querySelector(".payment-tab.active");
+    if (activeTab && activeTab.style.display === "none") {
+      const firstVisible = [...document.querySelectorAll(".payment-tab")].find(t => t.style.display !== "none");
+      if (firstVisible) firstVisible.click();
+    }
+  } catch { }
 }
 
 function hidePaywall() {
@@ -38,6 +59,26 @@ document.getElementById("btn-stripe-pay").addEventListener("click", async () => 
   btn.disabled = true; btn.textContent = "跳转中...";
   try {
     const res = await fetch("/payments/stripe/checkout", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (res.status === 401) { showAuthModal(); return; }
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else btn.textContent = "出错了，请重试";
+  } catch {
+    btn.textContent = "出错了，请重试";
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// Airwallex checkout
+document.getElementById("btn-airwallex-pay").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-airwallex-pay");
+  btn.disabled = true; btn.textContent = "跳转中...";
+  try {
+    const res = await fetch("/payments/airwallex/checkout", {
       method: "POST",
       credentials: "include",
     });

@@ -1,9 +1,10 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import anthropic
 import stripe
+from airwallex import create_payment_link, verify_webhook_signature
 from auth import (
     GOOGLE_CLIENT_ID,
     GOOGLE_REDIRECT_URI,
@@ -337,6 +338,51 @@ async def usdt_submit(req: USDTRequest, user: User = Depends(require_user), db: 
 @app.get("/payments/usdt/address")
 async def usdt_address():
     return {"address": USDT_ADDRESS, "network": "TRC20"}
+
+
+@app.get("/payments/config")
+async def payments_config():
+    return {
+        "stripe_enabled": bool(os.getenv("STRIPE_SECRET_KEY")),
+        "airwallex_enabled": bool(os.getenv("AIRWALLEX_CLIENT_ID")),
+    }
+
+
+@app.post("/payments/airwallex/checkout")
+async def airwallex_checkout(request: Request, user: User = Depends(require_user)):
+    if not os.getenv("AIRWALLEX_CLIENT_ID"):
+        raise HTTPException(status_code=501, detail="Airwallex 未配置")
+    base_url = str(request.base_url).rstrip("/")
+    try:
+        url = create_payment_link(user.id, base_url)
+        return {"url": url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/payments/airwallex/webhook")
+async def airwallex_webhook(request: Request, db: Session = Depends(get_db)):
+    raw_body = await request.body()
+    timestamp = request.headers.get("x-timestamp", "")
+    signature = request.headers.get("x-signature", "")
+
+    if not verify_webhook_signature(raw_body, timestamp, signature):
+        raise HTTPException(status_code=400, detail="Invalid webhook signature")
+
+    event = await request.json()
+    event_name = event.get("name", "")
+    event_object = event.get("data", {}).get("object", {})
+
+    if event_name == "payment_intent.succeeded":
+        user_id = event_object.get("metadata", {}).get("user_id")
+        if user_id:
+            user = db.query(User).filter(User.id == int(user_id)).first()
+            if user:
+                user.is_subscribed = True
+                user.subscription_end = datetime.utcnow() + timedelta(days=30)
+                db.commit()
+
+    return {"ok": True}
 
 
 # ── utils ─────────────────────────────────────────────────────────────────────
