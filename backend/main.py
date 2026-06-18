@@ -242,7 +242,8 @@ async def generate(req: GenerateRequest, user: User = Depends(require_user), db:
         twitter_length=req.twitter_length,
     )
 
-    client = anthropic.Anthropic(api_key=api_key)
+    base_url = os.getenv("ANTHROPIC_BASE_URL")
+    client = anthropic.Anthropic(api_key=api_key, base_url=base_url) if base_url else anthropic.Anthropic(api_key=api_key)
     message = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=4096,
