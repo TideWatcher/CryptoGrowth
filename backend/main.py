@@ -245,7 +245,7 @@ async def generate(req: GenerateRequest, user: User = Depends(require_user), db:
     base_url = os.getenv("ANTHROPIC_BASE_URL")
     client = anthropic.Anthropic(api_key=api_key, base_url=base_url) if base_url else anthropic.Anthropic(api_key=api_key)
     message = client.messages.create(
-        model="claude-sonnet-4-6",
+        model=os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5-20250929"),
         max_tokens=4096,
         system=system_prompt,
         messages=[{"role": "user", "content": user_prompt}],
